@@ -1,27 +1,24 @@
-import socket 
-# Creating Client Socket 
-if __name__ == '__main__': 
-	host = '61.28.231.242'
-	port = 6996
+import socket
 
-	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
-# Connecting with Server 
-	sock.connect((host, port)) 
+IP = '61.28.231.242'
+PORT = 4455
+ADDR = (IP, PORT)
+FORMAT = "utf-8"
+SIZE = 1024
 
-	while True: 
-
-		filename = input('Input filename you want to send: ') 
-		try: 
-		# Reading file and sending data to server 
-			fi = open(filename, "r") 
-			data = fi.read() 
-			if not data: 
-				break
-			while data: 
-				sock.send(str(data).encode()) 
-				data = fi.read() 
-			# File is closed after data is sent 
-			fi.close() 
-
-		except IOError: 
-			print('You entered an invalid filename!\nPlease enter a valid name') 
+def main():
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client.connect(ADDR)
+    
+    file = open("txt.txt", "r")
+    data = file.read()
+    client.send("txt.txt".encode(FORMAT))
+    msg = client.recv(SIZE).decode(FORMAT)
+    print(f"[SERVER]: {msg}")
+    client.send(data.encode(FORMAT))
+    msg = client.recv(SIZE).decode(FORMAT)
+    print(f"[SERVER]: {msg}")
+    file.close()
+    client.close()
+if __name__ == "__main__":
+    main()       
