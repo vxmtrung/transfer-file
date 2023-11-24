@@ -1,33 +1,27 @@
-import socket
-import tqdm
-import os
+import socket 
+# Creating Client Socket 
+if __name__ == '__main__': 
+	host = '61.28.231.242'
+	port = 6996
 
-SEPARATOR = "<SEPARATOR>"
-BUFFER_SIZE = 2048
+	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+# Connecting with Server 
+	sock.connect((host, port)) 
 
-host = '61.28.231.242'
+	while True: 
 
-port = 4869
+		filename = input('Input filename you want to send: ') 
+		try: 
+		# Reading file and sending data to server 
+			fi = open(filename, "r") 
+			data = fi.read() 
+			if not data: 
+				break
+			while data: 
+				sock.send(str(data).encode()) 
+				data = fi.read() 
+			# File is closed after data is sent 
+			fi.close() 
 
-filename = "chapter1.pdf"
-
-filesize = os.path.getsize(filename)
-
-s = socket.socket()
-
-print(f"[+] Connecting to {host}:{port}")
-s.connect((host, port))
-print("[+] Connected.")
-
-s.send(f"{filename}{SEPARATOR}{filesize}".encode())
-
-progress = tqdm.tqdm(range(filesize), f"Sending {filename}", unit = "B", unit_scale=True, unit_divisor=1024)
-with open(filename, "rb") as f:
-    while True:
-        bytes_read = f.read(BUFFER_SIZE)
-        if not bytes_read:
-            break
-        s.sendall(bytes_read)
-        progress.update(len(bytes_read))
-
-s.close()
+		except IOError: 
+			print('You entered an invalid filename!\nPlease enter a valid name') 
